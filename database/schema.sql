@@ -20,7 +20,9 @@ CREATE TABLE events (
     end_time TIME NOT NULL,
     guest_count INTEGER NOT NULL,
     location VARCHAR(255) NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('draft', 'pending', 'confirmed', 'completed', 'cancelled')),
+    caterers_needed INTEGER NOT NULL DEFAULT 0,
+    bartenders_needed INTEGER NOT NULL DEFAULT 0,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -8,7 +8,7 @@ const usersRouter = require('./routes/users');
 const staffAssignmentsRouter = require('./routes/staffAssignments');
 const eventInventoryRouter = require('./routes/eventInventory');
 const paymentsRouter = require('./routes/payments');
-const inventoryItemsRouter = require('./routes/InventoryItems');
+const inventoryItemsRouter = require('./routes/inventoryItems');
 
 // Middleware
 app.use(cors({

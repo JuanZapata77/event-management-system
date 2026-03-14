@@ -5,7 +5,39 @@ const pool = require('../config/database');
 // GET all events
 router.get('/', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM events ORDER BY event_date DESC');
+        const { status, type, search, fromDate, toDate } = req.query;
+        const whereClauses = [];
+        const values = [];
+
+        if (status && status !== 'all') {
+            values.push(status);
+            whereClauses.push(`status = $${values.length}`);
+        }
+
+        if (type && type !== 'all') {
+            values.push(type);
+            whereClauses.push(`event_type = $${values.length}`);
+        }
+
+        if (search) {
+            values.push(`%${search}%`);
+            whereClauses.push(`(event_name ILIKE $${values.length} OR location ILIKE $${values.length} OR event_type ILIKE $${values.length})`);
+        }
+
+        if (fromDate) {
+            values.push(fromDate);
+            whereClauses.push(`event_date >= $${values.length}`);
+        }
+
+        if (toDate) {
+            values.push(toDate);
+            whereClauses.push(`event_date <= $${values.length}`);
+        }
+
+        const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+        const query = `SELECT * FROM events ${whereSql} ORDER BY event_date DESC, start_time DESC`;
+
+        const result = await pool.query(query, values);
         res.json(result.rows);
     } catch (error) {
         console.error(error);
@@ -34,14 +66,40 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { event_name, event_type, event_date, start_time, end_time, guest_count, location, status, notes } = req.body;
+        const {
+            event_name,
+            event_type,
+            event_date,
+            start_time,
+            end_time,
+            guest_count,
+            location,
+            status,
+            notes,
+            caterers_needed,
+            bartenders_needed,
+        } = req.body;
         
         const result = await pool.query(
             `UPDATE events 
              SET event_name = $1, event_type = $2, event_date = $3, start_time = $4, 
-                 end_time = $5, guest_count = $6, location = $7, status = $8, notes = $9
-             WHERE id = $10 RETURNING *`,
-            [event_name, event_type, event_date, start_time, end_time, guest_count, location, status, notes, id]
+                 end_time = $5, guest_count = $6, location = $7, status = $8, notes = $9,
+                 caterers_needed = $10, bartenders_needed = $11
+             WHERE id = $12 RETURNING *`,
+            [
+                event_name,
+                event_type,
+                event_date,
+                start_time,
+                end_time,
+                guest_count,
+                location,
+                status,
+                notes,
+                caterers_needed,
+                bartenders_needed,
+                id,
+            ]
         );
         
         if (result.rows.length === 0) {

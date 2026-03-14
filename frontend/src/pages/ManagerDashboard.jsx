@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import ManagerSidebar from '../components/ManagerSidebar';
 
 function ManagerDashboard() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ function ManagerDashboard() {
   });
   const [assignments, setAssignments] = useState([]);
   const [lowStockInventory, setLowStockInventory] = useState([]);
+  const [topWorkers, setTopWorkers] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -29,6 +31,7 @@ function ManagerDashboard() {
       const users = await usersRes.json();
       const inventory = await inventoryRes.json();
       const allAssignments = await assignmentsRes.json();
+      const workers = users.filter(u => u.role === 'worker');
 
       setAssignments(allAssignments);
 
@@ -42,11 +45,46 @@ function ManagerDashboard() {
         item => item.quantity_available <= item.minimum_threshold
       );
 
+      const workerPerformance = workers
+        .map((worker) => {
+          const confirmedAssignments = allAssignments.filter(
+            (assignment) => assignment.user_id === worker.id && assignment.confirmation_status === 'confirmed'
+          );
+
+          const roleCounts = confirmedAssignments.reduce((accumulator, assignment) => {
+            const role = assignment.role_for_event || 'worker';
+            accumulator[role] = (accumulator[role] || 0) + 1;
+            return accumulator;
+          }, {});
+
+          const primaryRole = Object.keys(roleCounts).length
+            ? Object.entries(roleCounts).sort((a, b) => b[1] - a[1])[0][0]
+            : 'worker';
+
+          return {
+            id: worker.id,
+            name: worker.name || 'Unnamed worker',
+            hourlyRate: worker.hourly_rate,
+            confirmedCount: confirmedAssignments.length,
+            primaryRole,
+          };
+        })
+        .sort((a, b) => {
+          if (b.confirmedCount !== a.confirmedCount) {
+            return b.confirmedCount - a.confirmedCount;
+          }
+
+          return a.name.localeCompare(b.name);
+        })
+        .slice(0, 3);
+
+      setTopWorkers(workerPerformance);
+
       setLowStockInventory(lowStock.slice(0, 3));
 
       setStats({
         totalEvents: events.length,
-        totalStaff: users.filter(u => u.role === 'worker').length,
+        totalStaff: workers.length,
         lowStockItems: lowStock.length,
         upcomingEvents
       });
@@ -99,40 +137,7 @@ function ManagerDashboard() {
       </header>
 
       <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-64 border-r border-slate-200 dark:border-[#7311d4]/10 bg-[#f7f6f8] dark:bg-[#191022] hidden lg:flex flex-col p-4 gap-6 sticky top-[65px] h-[calc(100vh-65px)]">
-          <div className="flex flex-col gap-1">
-            <p className="text-slate-500 dark:text-[#7311d4]/50 text-xs font-bold uppercase tracking-wider px-3 mb-2">Main Menu</p>
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#7311d4] text-white">
-              <span className="text-[20px]">📊</span>
-              <p className="text-sm font-medium">Dashboard</p>
-            </div>
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#7311d4]/10 transition-colors cursor-pointer">
-              <span className="text-[20px]">📅</span>
-              <p className="text-sm font-medium">Events</p>
-            </div>
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#7311d4]/10 transition-colors cursor-pointer">
-              <span className="text-[20px]">👥</span>
-              <p className="text-sm font-medium">Staff Management</p>
-            </div>
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#7311d4]/10 transition-colors cursor-pointer">
-              <span className="text-[20px]">📦</span>
-              <p className="text-sm font-medium">Inventory</p>
-            </div>
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#7311d4]/10 transition-colors cursor-pointer">
-              <span className="text-[20px]">📊</span>
-              <p className="text-sm font-medium">Reports</p>
-            </div>
-          </div>
-          
-          <div className="mt-auto p-4 rounded-xl bg-gradient-to-br from-[#7311d4]/20 to-transparent border border-[#7311d4]/20">
-            <p className="text-slate-900 dark:text-slate-100 text-xs font-bold mb-1">System Health</p>
-            <div className="w-full bg-slate-200 dark:bg-[#7311d4]/20 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-[#7311d4] h-full w-[94%]"></div>
-            </div>
-            <p className="text-slate-500 dark:text-[#7311d4]/50 text-[10px] mt-2">All services operational</p>
-          </div>
-        </aside>
+        <ManagerSidebar active="dashboard" className="sticky top-[65px] h-[calc(100vh-65px)]" />
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col p-8 gap-8">
@@ -286,33 +291,29 @@ function ManagerDashboard() {
             <div className="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-[#7311d4]/20 bg-white dark:bg-[#7311d4]/5 p-6 relative overflow-hidden">
               <div className="flex flex-col gap-1 relative z-10">
                 <h3 className="text-slate-900 dark:text-slate-100 font-bold text-lg">Quick Staff Overview</h3>
-                <p className="text-slate-500 dark:text-[#7311d4]/50 text-xs">Top performing staff this week</p>
+                  <p className="text-slate-500 dark:text-[#7311d4]/50 text-xs">Top workers by confirmed assignments</p>
               </div>
               <div className="flex flex-col gap-4 mt-2 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-slate-200 dark:bg-[#7311d4]/20"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold dark:text-slate-100">Marcus Wright</p>
-                    <p className="text-[10px] text-slate-500 dark:text-[#7311d4]/50">Lead Bartender • 12 Events</p>
-                  </div>
-                  <div className="text-emerald-500 font-bold text-sm">98% Rating</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-slate-200 dark:bg-[#7311d4]/20"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold dark:text-slate-100">Elena Rodriguez</p>
-                    <p className="text-[10px] text-slate-500 dark:text-[#7311d4]/50">Catering Head • 8 Events</p>
-                  </div>
-                  <div className="text-emerald-500 font-bold text-sm">96% Rating</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-slate-200 dark:bg-[#7311d4]/20"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold dark:text-slate-100">Samira Khan</p>
-                    <p className="text-[10px] text-slate-500 dark:text-[#7311d4]/50">Event Coordinator • 5 Events</p>
-                  </div>
-                  <div className="text-emerald-500 font-bold text-sm">94% Rating</div>
-                </div>
+                  {topWorkers.length > 0 ? (
+                    topWorkers.map((worker) => (
+                      <div key={worker.id} className="flex items-center gap-3">
+                        <div className="size-10 rounded-full bg-slate-200 dark:bg-[#7311d4]/20 flex items-center justify-center text-sm font-bold text-slate-700 dark:text-slate-200">
+                          {worker.name?.charAt(0)?.toUpperCase() || 'W'}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{worker.name}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-[#7311d4]/50 capitalize">{worker.primaryRole} • {worker.confirmedCount} confirmed events</p>
+                        </div>
+                        <div className="text-emerald-500 font-bold text-sm">
+                          {worker.hourlyRate !== null && worker.hourlyRate !== undefined
+                            ? `$${Number(worker.hourlyRate).toFixed(2)}/hr`
+                            : 'No rate'}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No workers found yet.</p>
+                  )}
               </div>
               <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
                 <span className="text-[120px] text-[#7311d4]">👥</span>
