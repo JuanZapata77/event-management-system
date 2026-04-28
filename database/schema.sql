@@ -7,6 +7,9 @@ CREATE TABLE users (
     role VARCHAR(20) NOT NULL CHECK (role IN ('manager', 'worker')),
     phone VARCHAR(20),
     hourly_rate DECIMAL(10, 2),
+    is_available_for_shifts BOOLEAN NOT NULL DEFAULT TRUE,
+    unavailable_from DATE,
+    unavailable_to DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -20,7 +23,7 @@ CREATE TABLE events (
     end_time TIME NOT NULL,
     guest_count INTEGER NOT NULL,
     location VARCHAR(255) NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('draft', 'pending', 'confirmed', 'completed', 'cancelled')),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('draft', 'pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
     caterers_needed INTEGER NOT NULL DEFAULT 0,
     bartenders_needed INTEGER NOT NULL DEFAULT 0,
     notes TEXT,

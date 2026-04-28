@@ -147,10 +147,6 @@ function ManagerDashboard() {
               <h1 className="text-slate-900 dark:text-slate-100 text-3xl font-black leading-tight tracking-tight">Manager Dashboard</h1>
               <p className="text-slate-600 dark:text-[#7311d4]/60 text-base font-normal">Real-time overview of event operations and logistics.</p>
             </div>
-            <button className="flex items-center justify-center gap-2 rounded-lg px-6 h-12 bg-[#7311d4] text-white text-sm font-bold shadow-lg shadow-[#7311d4]/20 hover:brightness-110 transition-all">
-              <span>➕</span>
-              <span>Create Event</span>
-            </button>
           </div>
 
           {/* Summary Cards */}

@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
+const { syncEventStatuses } = require('../utils/eventStatusAutomation');
 
 // GET all events
 router.get('/', async (req, res) => {
     try {
+        await syncEventStatuses(pool);
+
         const { status, type, search, fromDate, toDate } = req.query;
         const whereClauses = [];
         const values = [];
@@ -48,6 +51,8 @@ router.get('/', async (req, res) => {
 // GET single event by ID
 router.get('/:id', async (req, res) => {
     try {
+        await syncEventStatuses(pool);
+
         const { id } = req.params;
         const result = await pool.query('SELECT * FROM events WHERE id = $1', [id]);
         
@@ -65,6 +70,8 @@ router.get('/:id', async (req, res) => {
 // UPDATE event
 router.put('/:id', async (req, res) => {
     try {
+        await syncEventStatuses(pool);
+
         const { id } = req.params;
         const {
             event_name,
@@ -133,6 +140,8 @@ router.delete('/:id', async (req, res) => {
 // CREATE new event
 router.post('/', async (req, res) => {
     try {
+        await syncEventStatuses(pool);
+
         const { event_name, event_type, event_date, start_time, end_time, guest_count, location, notes, caterers_needed, bartenders_needed } = req.body;
         
         const result = await pool.query(
