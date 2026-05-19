@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 function EventDetails() {
   const { id } = useParams();
@@ -18,7 +19,7 @@ function EventDetails() {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/events/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/events/${id}`);
 
         if (!response.ok) {
           throw new Error('Could not load event details');
@@ -42,7 +43,7 @@ function EventDetails() {
         setWorkersLoading(true);
         setWorkersError('');
 
-        const response = await fetch(`http://localhost:5000/api/staff-assignments/event/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/staff-assignments/event/${id}`);
 
         if (!response.ok) {
           throw new Error('Could not load confirmed workers');
@@ -72,7 +73,7 @@ function EventDetails() {
       setWorkersError('');
       setRemovingAssignmentId(assignmentId);
 
-      const response = await fetch(`http://localhost:5000/api/staff-assignments/${assignmentId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff-assignments/${assignmentId}`, {
         method: 'DELETE',
       });
 

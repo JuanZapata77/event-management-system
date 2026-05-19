@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 const initialForm = {
   event_name: '',
@@ -30,7 +31,7 @@ function EventForm() {
 
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/events/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/events/${id}`);
         if (!response.ok) {
           throw new Error('Could not load event for edit');
         }
@@ -81,7 +82,7 @@ function EventForm() {
       };
 
       const response = await fetch(
-        isEdit ? `http://localhost:5000/api/events/${id}` : 'http://localhost:5000/api/events',
+        isEdit ? `${API_BASE_URL}/api/events/${id}` : `${API_BASE_URL}/api/events`,
         {
           method: isEdit ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },

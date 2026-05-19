@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 function EventsList() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ function EventsList() {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/events');
+      const response = await fetch(`${API_BASE_URL}/api/events`);
       const data = await response.json();
       setEvents(data);
     } catch (error) {
@@ -35,7 +36,7 @@ function EventsList() {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/staff-assignments');
+      const response = await fetch(`${API_BASE_URL}/api/staff-assignments`);
       const data = await response.json();
       setAssignments(data);
     } catch (error) {

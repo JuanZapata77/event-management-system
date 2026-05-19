@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 function ManagerDashboard() {
   const navigate = useNavigate();
@@ -21,10 +22,10 @@ function ManagerDashboard() {
   const fetchDashboardData = async () => {
     try {
       const [eventsRes, usersRes, inventoryRes, assignmentsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/events'),
-        fetch('http://localhost:5000/api/users'),
-        fetch('http://localhost:5000/api/inventory-items'),
-        fetch('http://localhost:5000/api/staff-assignments')
+        fetch(`${API_BASE_URL}/api/events`),
+        fetch(`${API_BASE_URL}/api/users`),
+        fetch(`${API_BASE_URL}/api/inventory-items`),
+        fetch(`${API_BASE_URL}/api/staff-assignments`)
       ]);
 
       const events = await eventsRes.json();

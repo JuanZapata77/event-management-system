@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 function StaffManagement() {
   const [workers, setWorkers] = useState([]);
@@ -21,8 +22,8 @@ function StaffManagement() {
       setLoading(true);
 
       const [usersRes, assignmentsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/users'),
-        fetch('http://localhost:5000/api/staff-assignments'),
+        fetch(`${API_BASE_URL}/api/users`),
+        fetch(`${API_BASE_URL}/api/staff-assignments`),
       ]);
 
       const usersData = await usersRes.json();
@@ -85,7 +86,7 @@ function StaffManagement() {
         role: 'worker',
       };
 
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -12,8 +12,13 @@ const paymentsRouter = require('./routes/payments');
 const inventoryItemsRouter = require('./routes/inventoryItems');
 
 // Middleware
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -32,7 +37,7 @@ app.use('/api/event-inventory', eventInventoryRouter);
 app.use('/api/payments', paymentsRouter);
 
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

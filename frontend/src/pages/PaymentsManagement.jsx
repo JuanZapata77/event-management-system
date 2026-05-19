@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 function PaymentsManagement() {
   const [payments, setPayments] = useState([]);
@@ -23,10 +24,10 @@ function PaymentsManagement() {
     try {
       setLoading(true);
       const [paymentsRes, usersRes, eventsRes, assignmentsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/payments'),
-        fetch('http://localhost:5000/api/users'),
-        fetch('http://localhost:5000/api/events'),
-        fetch('http://localhost:5000/api/staff-assignments'),
+        fetch(`${API_BASE_URL}/api/payments`),
+        fetch(`${API_BASE_URL}/api/users`),
+        fetch(`${API_BASE_URL}/api/events`),
+        fetch(`${API_BASE_URL}/api/staff-assignments`),
       ]);
 
       const paymentsData = await paymentsRes.json();
@@ -156,7 +157,7 @@ function PaymentsManagement() {
         throw new Error('A payment for this worker and event already exists.');
       }
 
-      const response = await fetch('http://localhost:5000/api/payments', {
+      const response = await fetch(`${API_BASE_URL}/api/payments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

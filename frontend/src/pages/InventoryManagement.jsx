@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ManagerSidebar from '../components/ManagerSidebar';
+import { API_BASE_URL } from '../config';
 
 function InventoryManagement() {
   const [items, setItems] = useState([]);
@@ -18,7 +19,7 @@ function InventoryManagement() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/inventory-items');
+      const response = await fetch(`${API_BASE_URL}/api/inventory-items`);
       const data = await response.json();
       setItems(data);
     } catch (error) {
@@ -63,7 +64,7 @@ function InventoryManagement() {
         minimum_threshold: Number(formData.minimum_threshold || 0),
       };
 
-      const response = await fetch('http://localhost:5000/api/inventory-items', {
+      const response = await fetch(`${API_BASE_URL}/api/inventory-items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

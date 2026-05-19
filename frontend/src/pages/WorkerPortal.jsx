@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 
 function WorkerPortal() {
   const [workerId, setWorkerId] = useState(null);
@@ -115,7 +116,7 @@ function WorkerPortal() {
 
   const fetchWorkerData = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${workerId}`);
+      const response = await fetch(`${API_BASE_URL}/api/users/${workerId}`);
       const data = await response.json();
       setWorker(data);
       setIsAvailableForShifts(data.is_available_for_shifts !== false);
@@ -129,8 +130,8 @@ function WorkerPortal() {
   const fetchAvailableEvents = async () => {
     try {
       const [eventsRes, assignmentsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/events'),
-        fetch('http://localhost:5000/api/staff-assignments')
+        fetch(`${API_BASE_URL}/api/events`),
+        fetch(`${API_BASE_URL}/api/staff-assignments`)
       ]);
 
       const events = await eventsRes.json();
@@ -183,7 +184,7 @@ function WorkerPortal() {
 
   const fetchMyAssignments = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/staff-assignments/user/${workerId}`);
+      const response = await fetch(`${API_BASE_URL}/api/staff-assignments/user/${workerId}`);
       const data = await response.json();
       setMyAssignments(data);
     } catch (error) {
@@ -203,7 +204,7 @@ function WorkerPortal() {
       setIsLoggingIn(true);
       setLoginError('');
 
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -242,7 +243,7 @@ function WorkerPortal() {
       const existingAssignment = myAssignments.find(a => a.event_id === eventId);
 
       if (existingAssignment) {
-        const response = await fetch(`http://localhost:5000/api/staff-assignments/${existingAssignment.id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/staff-assignments/${existingAssignment.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -259,7 +260,7 @@ function WorkerPortal() {
           throw new Error(errorPayload.error || 'Unable to confirm assignment');
         }
       } else {
-        const response = await fetch('http://localhost:5000/api/staff-assignments', {
+        const response = await fetch(`${API_BASE_URL}/api/staff-assignments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -296,7 +297,7 @@ function WorkerPortal() {
       setIsSavingAvailability(true);
       setAvailabilityMessage('');
 
-      const response = await fetch(`http://localhost:5000/api/users/${workerId}/availability`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/${workerId}/availability`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -375,7 +376,7 @@ function WorkerPortal() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/staff-assignments/user/${workerId}/history`);
+      const response = await fetch(`${API_BASE_URL}/api/staff-assignments/user/${workerId}/history`);
       const data = await response.json();
       setHistoryAssignments(data.assignments || []);
       setHistoryTotal(Number(data.total_earnings || 0));
