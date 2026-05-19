@@ -3,11 +3,13 @@ import React, { useMemo, useState, useEffect } from 'react';
 function WorkerPortal() {
   const [workerId, setWorkerId] = useState(null);
   const [worker, setWorker] = useState(null);
-  const [workers, setWorkers] = useState([]);
   const [availableEvents, setAvailableEvents] = useState([]);
   const [myAssignments, setMyAssignments] = useState([]);
   const [allAssignments, setAllAssignments] = useState([]);
   const [showLogin, setShowLogin] = useState(true);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [isAvailableForShifts, setIsAvailableForShifts] = useState(true);
   const [unavailableFrom, setUnavailableFrom] = useState('');
@@ -19,7 +21,17 @@ function WorkerPortal() {
   const [historyTotal, setHistoryTotal] = useState(0);
 
   useEffect(() => {
-    fetchWorkers();
+    try {
+      const rawUser = localStorage.getItem('eventAuthUser');
+      const savedUser = rawUser ? JSON.parse(rawUser) : null;
+
+      if (savedUser?.role === 'worker' && savedUser?.id) {
+        setWorkerId(savedUser.id);
+        setShowLogin(false);
+      }
+    } catch (error) {
+      setShowLogin(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -101,17 +113,6 @@ function WorkerPortal() {
     return Math.max(0, rate * durationHours);
   };
 
-  const fetchWorkers = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/users');
-      const data = await response.json();
-      const workersList = data.filter(user => user.role === 'worker');
-      setWorkers(workersList);
-    } catch (error) {
-      console.error('Error fetching workers:', error);
-    }
-  };
-
   const fetchWorkerData = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/users/${workerId}`);
@@ -190,10 +191,49 @@ function WorkerPortal() {
     }
   };
 
-  const handleLogin = (selectedWorkerId) => {
-    setWorkerId(parseInt(selectedWorkerId, 10));
-    setShowLogin(false);
-    setActiveSection('dashboard');
+  const handleLoginInputChange = (event) => {
+    const { name, value } = event.target;
+    setLoginForm((previous) => ({ ...previous, [name]: value }));
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      setIsLoggingIn(true);
+      setLoginError('');
+
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: loginForm.username.trim().toLowerCase(),
+          password: loginForm.password,
+        }),
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Unable to sign in');
+      }
+
+      if (!payload?.user || payload.user.role !== 'worker') {
+        throw new Error('Only worker accounts can access this portal');
+      }
+
+      localStorage.setItem('eventAuthUser', JSON.stringify(payload.user));
+      setWorkerId(payload.user.id);
+      setShowLogin(false);
+      setActiveSection('dashboard');
+      setLoginForm({ username: '', password: '' });
+    } catch (error) {
+      setLoginError(error.message || 'Unexpected error while signing in');
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   const handleConfirm = async (eventId, role) => {
@@ -457,17 +497,45 @@ function WorkerPortal() {
       <div className="min-h-screen bg-gradient-to-br from-[#7311d4] to-purple-900 flex items-center justify-center p-8">
         <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Worker Portal Login</h2>
-          <p className="text-gray-600 mb-6">Select your name to continue:</p>
-          <select
-            onChange={(e) => handleLogin(e.target.value)}
-            defaultValue=""
-            className="w-full p-3 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:border-[#7311d4] transition-colors"
-          >
-            <option value="" disabled>Choose your name...</option>
-            {workers.map(w => (
-              <option key={w.id} value={w.id}>{w.name}</option>
-            ))}
-          </select>
+          <p className="text-gray-600 mb-6">Sign in with your worker credentials.</p>
+
+          <form className="space-y-4" onSubmit={handleLogin}>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Username</span>
+              <input
+                type="text"
+                name="username"
+                value={loginForm.username}
+                onChange={handleLoginInputChange}
+                required
+                autoComplete="username"
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Password</span>
+              <input
+                type="password"
+                name="password"
+                value={loginForm.password}
+                onChange={handleLoginInputChange}
+                required
+                autoComplete="current-password"
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
+              />
+            </label>
+
+            {loginError ? <p className="text-sm text-red-600">{loginError}</p> : null}
+
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full rounded-lg bg-[#7311d4] py-2.5 font-semibold text-white hover:bg-[#7311d4]/90 disabled:opacity-60"
+            >
+              {isLoggingIn ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -531,6 +599,7 @@ function WorkerPortal() {
 
             <button
               onClick={() => {
+                localStorage.removeItem('eventAuthUser');
                 setShowLogin(true);
                 setWorkerId(null);
                 setWorker(null);

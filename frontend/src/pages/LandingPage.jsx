@@ -12,7 +12,7 @@ function LandingPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div 
-            onClick={() => navigate('/manager')}
+            onClick={() => navigate('/manager/login')}
             className="bg-white rounded-2xl p-12 cursor-pointer transform transition-all hover:scale-105 hover:shadow-2xl"
           >
             <div className="text-6xl mb-4">👔</div>

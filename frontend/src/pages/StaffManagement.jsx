@@ -10,7 +10,7 @@ function StaffManagement() {
   const [formError, setFormError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    username: '',
     phone: '',
     hourly_rate: '',
     password: '',
@@ -43,13 +43,25 @@ function StaffManagement() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      if (name === 'username') {
+        const normalized = value.trim().toLowerCase();
+
+        return {
+          ...prev,
+          username: value,
+          password: prev.password || (normalized ? `${normalized}@123` : ''),
+        };
+      }
+
+      return { ...prev, [name]: value };
+    });
   };
 
   const resetForm = () => {
     setFormData({
       name: '',
-      email: '',
+      username: '',
       phone: '',
       hourly_rate: '',
       password: '',
@@ -66,10 +78,10 @@ function StaffManagement() {
 
       const payload = {
         name: formData.name,
-        email: formData.email,
+        username: formData.username,
         phone: formData.phone || null,
         hourly_rate: formData.hourly_rate ? Number(formData.hourly_rate) : null,
-        password_hash: formData.password,
+        password: formData.password || `${String(formData.username || '').trim().toLowerCase()}@123`,
         role: 'worker',
       };
 
@@ -149,11 +161,10 @@ function StaffManagement() {
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-sm text-slate-600 dark:text-slate-300">Email</span>
+                <span className="text-sm text-slate-600 dark:text-slate-300">Username</span>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  name="username"
+                  value={formData.username}
                   onChange={handleInputChange}
                   required
                   className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-[#2a1b3d] border border-slate-300 dark:border-[#7311d4]/20 text-slate-900 dark:text-slate-100"
@@ -184,9 +195,9 @@ function StaffManagement() {
               </label>
 
               <label className="flex flex-col gap-1 md:col-span-2">
-                <span className="text-sm text-slate-600 dark:text-slate-300">Password</span>
+                <span className="text-sm text-slate-600 dark:text-slate-300">Password (manager-visible)</span>
                 <input
-                  type="password"
+                  type="text"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
@@ -216,6 +227,8 @@ function StaffManagement() {
                   <tr className="bg-slate-50 dark:bg-[#2a1b3d]/50 border-b border-[#7311d4]/10">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Worker</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Email</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Username</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Login Password</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Phone</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Rate</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Assignments</th>
@@ -226,7 +239,7 @@ function StaffManagement() {
                 <tbody className="divide-y divide-[#7311d4]/5">
                   {loading ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-8 text-center text-slate-500">Loading staff...</td>
+                      <td colSpan={9} className="px-6 py-8 text-center text-slate-500">Loading staff...</td>
                     </tr>
                   ) : workers.length > 0 ? (
                     workers.map((worker) => {
@@ -236,6 +249,8 @@ function StaffManagement() {
                         <tr key={worker.id} className="hover:bg-[#7311d4]/5 transition-colors">
                           <td className="px-6 py-4 font-semibold text-slate-900 dark:text-slate-100">{worker.name}</td>
                           <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{worker.email}</td>
+                          <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{worker.username || '-'}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-200">{worker.login_password_plain || '-'}</td>
                           <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{worker.phone || '-'}</td>
                           <td className="px-6 py-4 text-sm text-slate-700 dark:text-slate-200">{worker.hourly_rate ? `$${Number(worker.hourly_rate).toFixed(2)}/hr` : '-'}</td>
                           <td className="px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-200">{stats.total}</td>
@@ -246,7 +261,7 @@ function StaffManagement() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={7} className="px-6 py-8 text-center text-slate-500">No workers found.</td>
+                      <td colSpan={9} className="px-6 py-8 text-center text-slate-500">No workers found.</td>
                     </tr>
                   )}
                 </tbody>

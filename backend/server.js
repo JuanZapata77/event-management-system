@@ -4,6 +4,7 @@ const pool = require('./config/database');
 const app = express();
 const eventsRouter = require('./routes/events');
 const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth');
 
 const staffAssignmentsRouter = require('./routes/staffAssignments');
 const eventInventoryRouter = require('./routes/eventInventory');
@@ -23,6 +24,7 @@ app.get('/api/test', (req, res) => {
 });
 
 app.use('/api/events', eventsRouter);
+app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/inventory-items', inventoryItemsRouter);
 app.use('/api/staff-assignments', staffAssignmentsRouter);

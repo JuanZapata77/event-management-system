@@ -48,7 +48,13 @@ function ManagerSidebar({ active = 'dashboard', className = '' }) {
       </nav>
 
       <div className="mt-auto pt-4 border-t border-[#7311d4]/10">
-        <button onClick={() => navigate('/')} className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-colors">
+        <button
+          onClick={() => {
+            localStorage.removeItem('eventAuthUser');
+            navigate('/');
+          }}
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+        >
           <span className="text-xl">🚪</span>
           <span className="text-sm font-medium">Logout</span>
         </button>
