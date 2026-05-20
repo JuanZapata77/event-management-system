@@ -50,8 +50,10 @@ function WorkerPortal() {
   useEffect(() => {
     let interval;
     if (workerId) {
-      // poll notifications every 30 seconds
+      // keep available events fresh so the bell can react to newly created events
       interval = setInterval(() => {
+        fetchAvailableEvents();
+        fetchMyAssignments();
         fetchNotifications();
       }, 30000);
     }
@@ -412,6 +414,8 @@ function WorkerPortal() {
     }
   };
 
+  const notificationBadgeCount = unreadCount > 0 ? unreadCount : availableEvents.length;
+
   const renderScheduleCards = (items) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {items.length > 0 ? (
@@ -622,9 +626,9 @@ function WorkerPortal() {
           <div className="flex items-center gap-3">
             <button onClick={() => setActiveSection('events')} className="p-2 rounded-full bg-slate-200 dark:bg-[#7311d4]/10 text-slate-600 dark:text-[#7311d4] relative">
               <span className="text-xl">🔔</span>
-              {unreadCount > 0 && (
+              {notificationBadgeCount > 0 && (
                 <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
-                  {unreadCount}
+                  {notificationBadgeCount}
                 </span>
               )}
             </button>
