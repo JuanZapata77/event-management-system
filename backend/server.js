@@ -10,6 +10,7 @@ const staffAssignmentsRouter = require('./routes/staffAssignments');
 const eventInventoryRouter = require('./routes/eventInventory');
 const paymentsRouter = require('./routes/payments');
 const inventoryItemsRouter = require('./routes/inventoryItems');
+const notificationsRouter = require('./routes/notifications');
 
 
 // Middleware
@@ -36,6 +37,7 @@ app.use('/api/inventory-items', inventoryItemsRouter);
 app.use('/api/staff-assignments', staffAssignmentsRouter);
 app.use('/api/event-inventory', eventInventoryRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 
 

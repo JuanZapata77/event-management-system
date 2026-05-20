@@ -149,8 +149,26 @@ router.post('/', async (req, res) => {
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
             [event_name, event_type, event_date, start_time, end_time, guest_count, location, notes, caterers_needed, bartenders_needed]
         );
-        
-        res.status(201).json(result.rows[0]);
+        const newEvent = result.rows[0];
+
+        // Create notifications for all workers to inform them of the new event
+        try {
+            const workers = await pool.query("SELECT id, name FROM users WHERE role = 'worker'");
+            const message = `New event available: ${newEvent.event_name} on ${newEvent.event_date}`;
+
+            const insertPromises = workers.rows.map((w) => {
+                return pool.query(
+                    'INSERT INTO notifications (user_id, event_id, message) VALUES ($1, $2, $3)',
+                    [w.id, newEvent.id, message]
+                );
+            });
+
+            await Promise.all(insertPromises);
+        } catch (notifyErr) {
+            console.error('Error creating notifications:', notifyErr);
+        }
+
+        res.status(201).json(newEvent);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

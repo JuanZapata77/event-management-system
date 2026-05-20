@@ -20,6 +20,8 @@ function WorkerPortal() {
   const [isSavingAvailability, setIsSavingAvailability] = useState(false);
   const [historyAssignments, setHistoryAssignments] = useState([]);
   const [historyTotal, setHistoryTotal] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     try {
@@ -41,7 +43,20 @@ function WorkerPortal() {
       fetchAvailableEvents();
       fetchMyAssignments();
       fetchHistory();
+      fetchNotifications();
     }
+  }, [workerId]);
+
+  useEffect(() => {
+    let interval;
+    if (workerId) {
+      // poll notifications every 30 seconds
+      interval = setInterval(() => {
+        fetchNotifications();
+      }, 30000);
+    }
+
+    return () => clearInterval(interval);
   }, [workerId]);
 
   const getEventEndDateTime = (eventDate, endTime) => {
@@ -385,6 +400,18 @@ function WorkerPortal() {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/notifications?userId=${workerId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setNotifications(data || []);
+      setUnreadCount((data || []).filter(n => !n.is_read).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
   const renderScheduleCards = (items) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {items.length > 0 ? (
@@ -595,7 +622,11 @@ function WorkerPortal() {
           <div className="flex items-center gap-3">
             <button onClick={() => setActiveSection('events')} className="p-2 rounded-full bg-slate-200 dark:bg-[#7311d4]/10 text-slate-600 dark:text-[#7311d4] relative">
               <span className="text-xl">🔔</span>
-              {availableEvents.length > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-[#f7f6f8] dark:border-[#191022]"></span>}
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
             <button
