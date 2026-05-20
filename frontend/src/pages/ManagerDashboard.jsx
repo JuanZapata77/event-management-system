@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ManagerSidebar from '../components/ManagerSidebar';
 import { API_BASE_URL } from '../config';
 
 function ManagerDashboard() {
-  const navigate = useNavigate();
+  const getCurrentUser = () => {
+    try {
+      const raw = localStorage.getItem('eventAuthUser');
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      return null;
+    }
+  };
+
   const [stats, setStats] = useState({
     totalEvents: 0,
     totalStaff: 0,
@@ -14,10 +21,17 @@ function ManagerDashboard() {
   const [assignments, setAssignments] = useState([]);
   const [lowStockInventory, setLowStockInventory] = useState([]);
   const [topWorkers, setTopWorkers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const [mfaPassword, setMfaPassword] = useState('');
+  const [mfaSetupLoading, setMfaSetupLoading] = useState(false);
+  const [mfaSetupError, setMfaSetupError] = useState('');
+  const [mfaSetupResult, setMfaSetupResult] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  const isMfaEnabled = currentUser?.mfa_enabled === true;
 
   const fetchDashboardData = async () => {
     try {
@@ -91,6 +105,43 @@ function ManagerDashboard() {
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  const handleEnable2FA = async (event) => {
+    event.preventDefault();
+
+    try {
+      setMfaSetupLoading(true);
+      setMfaSetupError('');
+      setMfaSetupResult(null);
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/manager-2fa/setup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: currentUser?.id,
+          password: mfaPassword,
+        }),
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Unable to enable two-factor authentication');
+      }
+
+      const updatedUser = { ...currentUser, mfa_enabled: true };
+      localStorage.setItem('eventAuthUser', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      setMfaSetupResult(payload);
+      setMfaPassword('');
+    } catch (error) {
+      setMfaSetupError(error.message || 'Unexpected error while enabling two-factor authentication');
+    } finally {
+      setMfaSetupLoading(false);
     }
   };
 
@@ -316,6 +367,59 @@ function ManagerDashboard() {
                 <span className="text-[120px] text-[#7311d4]">👥</span>
               </div>
             </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 dark:border-[#7311d4]/20 bg-white dark:bg-[#7311d4]/5 p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h3 className="text-slate-900 dark:text-slate-100 font-bold text-lg">Manager Security</h3>
+                <p className="text-slate-500 dark:text-[#7311d4]/50 text-sm">Free two-factor authentication using an authenticator app.</p>
+              </div>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${isMfaEnabled ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'}`}>
+                {isMfaEnabled ? '2FA Enabled' : '2FA Not Enabled'}
+              </span>
+            </div>
+
+            {!isMfaEnabled ? (
+              <form className="grid gap-4 md:grid-cols-[1fr_auto] items-end" onSubmit={handleEnable2FA}>
+                <label className="block">
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Confirm your password</span>
+                  <input
+                    type="password"
+                    value={mfaPassword}
+                    onChange={(e) => setMfaPassword(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
+                    placeholder="Enter password to enable 2FA"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={mfaSetupLoading}
+                  className="rounded-lg bg-[#7311d4] px-4 py-2.5 font-semibold text-white hover:bg-[#7311d4]/90 disabled:opacity-60"
+                >
+                  {mfaSetupLoading ? 'Enabling...' : 'Enable 2FA'}
+                </button>
+              </form>
+            ) : (
+              <p className="text-sm text-emerald-600 dark:text-emerald-400">This manager account now requires a one-time code on every login.</p>
+            )}
+
+            {mfaSetupError ? <p className="text-sm text-red-600">{mfaSetupError}</p> : null}
+
+            {mfaSetupResult ? (
+              <div className="grid gap-6 md:grid-cols-[auto_1fr] items-center">
+                <div className="rounded-xl bg-white p-4 border border-slate-200">
+                  <img src={mfaSetupResult.qrCodeDataUrl} alt="2FA QR Code" className="h-56 w-56 object-contain" />
+                </div>
+                <div className="space-y-3">
+                  <p className="text-slate-700 dark:text-slate-200 text-sm">Scan this QR code with Microsoft Authenticator, Authy, or Google Authenticator. If needed, manually enter this secret:</p>
+                  <div className="rounded-lg bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-[#7311d4]/20 p-3 text-sm font-mono break-all text-slate-800 dark:text-slate-200">
+                    {mfaSetupResult.secret}
+                  </div>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs">After scanning, use the 6-digit code from your app when signing in as manager.</p>
+                </div>
+              </div>
+            ) : null}
           </div>
         </main>
       </div>

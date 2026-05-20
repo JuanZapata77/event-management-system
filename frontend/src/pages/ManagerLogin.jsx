@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 
 function ManagerLogin() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', password: '', otpCode: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -26,6 +26,7 @@ function ManagerLogin() {
         body: JSON.stringify({
           username: formData.username.trim().toLowerCase(),
           password: formData.password,
+          otpCode: formData.otpCode,
         }),
       });
 
@@ -80,6 +81,21 @@ function ManagerLogin() {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
             />
           </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Authenticator Code</span>
+              <input
+                type="text"
+                name="otpCode"
+                value={formData.otpCode}
+                onChange={handleInputChange}
+                autoComplete="one-time-code"
+                inputMode="numeric"
+                placeholder="123456"
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
+              />
+              <p className="mt-1 text-xs text-gray-500">Required once 2FA is enabled for the manager account.</p>
+            </label>
 
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
 

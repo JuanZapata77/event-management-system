@@ -20,7 +20,6 @@ function WorkerPortal() {
   const [isSavingAvailability, setIsSavingAvailability] = useState(false);
   const [historyAssignments, setHistoryAssignments] = useState([]);
   const [historyTotal, setHistoryTotal] = useState(0);
-  const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -407,7 +406,6 @@ function WorkerPortal() {
       const res = await fetch(`${API_BASE_URL}/api/notifications?userId=${workerId}`);
       if (!res.ok) return;
       const data = await res.json();
-      setNotifications(data || []);
       setUnreadCount((data || []).filter(n => !n.is_read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
