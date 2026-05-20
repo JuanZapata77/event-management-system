@@ -34,6 +34,27 @@ async function getUsersColumnInfo() {
     return usersColumnInfoPromise;
 }
 
+async function ensureMfaColumns() {
+    const { hasMfaEnabled, hasMfaSecret } = await getUsersColumnInfo();
+
+    if (hasMfaEnabled && hasMfaSecret) {
+        return { hasMfaEnabled, hasMfaSecret };
+    }
+
+    await pool.query(
+        `ALTER TABLE users
+         ADD COLUMN IF NOT EXISTS mfa_secret TEXT`
+    );
+
+    await pool.query(
+        `ALTER TABLE users
+         ADD COLUMN IF NOT EXISTS mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE`
+    );
+
+    usersColumnInfoPromise = null;
+    return getUsersColumnInfo();
+}
+
 function buildUserSelectColumns({ hasMfaEnabled }) {
     const columns = [
         'id',
@@ -167,12 +188,7 @@ router.post('/manager-2fa/setup', async (req, res) => {
             return res.status(403).json({ error: 'Only manager accounts can enable 2FA' });
         }
 
-        const { hasMfaEnabled, hasMfaSecret } = await getUsersColumnInfo();
-        if (!hasMfaEnabled || !hasMfaSecret) {
-            return res.status(409).json({
-                error: 'Two-factor authentication columns are not installed yet. Please run the database migration first.',
-            });
-        }
+        const { hasMfaEnabled, hasMfaSecret } = await ensureMfaColumns();
 
         const passwordValid = await bcrypt.compare(String(password), user.password_hash);
         if (!passwordValid) {
