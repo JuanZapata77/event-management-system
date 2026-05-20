@@ -6,20 +6,55 @@ const pool = require('../config/database');
 
 const router = express.Router();
 
-const safeUserColumns = `
-    id,
-    name,
-    email,
-    username,
-    role,
-    phone,
-    hourly_rate,
-    is_available_for_shifts,
-    unavailable_from,
-    unavailable_to,
-    mfa_enabled,
-    created_at
-`;
+let usersColumnInfoPromise = null;
+
+async function getUsersColumnInfo() {
+    if (!usersColumnInfoPromise) {
+        usersColumnInfoPromise = pool
+            .query(
+                `SELECT column_name
+                 FROM information_schema.columns
+                 WHERE table_schema = 'public'
+                   AND table_name = 'users'`
+            )
+            .then((result) => {
+                const columns = new Set(result.rows.map((row) => row.column_name));
+
+                return {
+                    hasMfaEnabled: columns.has('mfa_enabled'),
+                    hasMfaSecret: columns.has('mfa_secret'),
+                };
+            })
+            .catch((error) => {
+                usersColumnInfoPromise = null;
+                throw error;
+            });
+    }
+
+    return usersColumnInfoPromise;
+}
+
+function buildUserSelectColumns({ hasMfaEnabled }) {
+    const columns = [
+        'id',
+        'name',
+        'email',
+        'username',
+        'role',
+        'phone',
+        'hourly_rate',
+        'is_available_for_shifts',
+        'unavailable_from',
+        'unavailable_to',
+    ];
+
+    if (hasMfaEnabled) {
+        columns.push('mfa_enabled');
+    }
+
+    columns.push('created_at');
+    return columns.join(',\n    ');
+}
 
 function isLegacyPlainPassword(storedHash) {
     return !storedHash || (!storedHash.startsWith('$2a$') && !storedHash.startsWith('$2b$') && !storedHash.startsWith('$2y$'));
@@ -34,8 +69,25 @@ router.post('/login', async (req, res) => {
         }
 
         const normalizedUsername = String(username).trim().toLowerCase();
+        const { hasMfaEnabled, hasMfaSecret } = await getUsersColumnInfo();
+
+        const loginColumns = [
+            'id',
+            'username',
+            'password_hash',
+            'role',
+        ];
+
+        if (hasMfaEnabled) {
+            loginColumns.push('mfa_enabled');
+        }
+
+        if (hasMfaSecret) {
+            loginColumns.push('mfa_secret');
+        }
+
         const result = await pool.query(
-            `SELECT id, username, password_hash, role, mfa_enabled, mfa_secret FROM users WHERE lower(username) = $1 LIMIT 1`,
+            `SELECT ${loginColumns.join(', ')} FROM users WHERE lower(username) = $1 LIMIT 1`,
             [normalizedUsername]
         );
 
@@ -82,7 +134,7 @@ router.post('/login', async (req, res) => {
         }
 
         const safeUserResult = await pool.query(
-            `SELECT ${safeUserColumns} FROM users WHERE id = $1`,
+            `SELECT ${buildUserSelectColumns({ hasMfaEnabled })} FROM users WHERE id = $1`,
             [account.id]
         );
 
@@ -113,6 +165,13 @@ router.post('/manager-2fa/setup', async (req, res) => {
         const user = result.rows[0];
         if (user.role !== 'manager') {
             return res.status(403).json({ error: 'Only manager accounts can enable 2FA' });
+        }
+
+        const { hasMfaEnabled, hasMfaSecret } = await getUsersColumnInfo();
+        if (!hasMfaEnabled || !hasMfaSecret) {
+            return res.status(409).json({
+                error: 'Two-factor authentication columns are not installed yet. Please run the database migration first.',
+            });
         }
 
         const passwordValid = await bcrypt.compare(String(password), user.password_hash);
