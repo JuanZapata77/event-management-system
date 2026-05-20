@@ -11,6 +11,7 @@ const eventInventoryRouter = require('./routes/eventInventory');
 const paymentsRouter = require('./routes/payments');
 const inventoryItemsRouter = require('./routes/inventoryItems');
 
+
 // Middleware
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
   .split(',')
@@ -35,6 +36,7 @@ app.use('/api/inventory-items', inventoryItemsRouter);
 app.use('/api/staff-assignments', staffAssignmentsRouter);
 app.use('/api/event-inventory', eventInventoryRouter);
 app.use('/api/payments', paymentsRouter);
+
 
 
 const PORT = process.env.PORT || 5000;

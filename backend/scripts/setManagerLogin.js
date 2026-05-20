@@ -106,7 +106,11 @@ async function run() {
   throw new Error('Could not find an available manager username after multiple attempts');
 }
 
-run().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+module.exports = run;
+
+if (require.main === module) {
+  run().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
