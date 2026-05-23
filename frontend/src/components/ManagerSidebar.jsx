@@ -56,7 +56,7 @@ function ManagerSidebar({ active = 'dashboard', className = '' }) {
         </div>
       </aside>
 
-      <div className="sticky top-[65px] z-40 border-b border-[#7311d4]/15 bg-[#f7f6f8]/95 px-4 py-3 backdrop-blur dark:bg-[#191022]/95 lg:hidden">
+      <div className="w-full border-b border-[#7311d4]/15 bg-[#f7f6f8]/95 px-4 py-3 backdrop-blur dark:bg-[#191022]/95 lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <button onClick={() => navigate('/manager')} className="flex items-center gap-3 text-left">
             <div className="flex size-10 items-center justify-center rounded-full bg-[#7311d4] text-white">

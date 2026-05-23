@@ -192,7 +192,7 @@ function ManagerDashboard() {
         <ManagerSidebar active="dashboard" className="sticky top-[65px] h-[calc(100vh-65px)]" />
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col gap-6 p-4 sm:p-6 lg:p-8 lg:gap-8 pt-24 lg:pt-0">
+        <main className="flex-1 flex flex-col gap-6 p-4 sm:p-6 lg:p-8 lg:gap-8">
           {/* Header Section */}
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div className="flex flex-col gap-1">
