@@ -157,7 +157,7 @@ function ManagerDashboard() {
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-[#f7f6f8] dark:bg-[#191022]">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 bg-[#f7f6f8] px-4 py-3 dark:border-[#7311d4]/20 dark:bg-[#191022] sm:px-6 lg:px-10">
+      <header style={{outline: '3px solid #ff00ff'}} className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 bg-[#f7f6f8] px-4 py-3 dark:border-[#7311d4]/20 dark:bg-[#191022] sm:px-6 lg:px-10">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="text-[#7311d4] size-8 flex items-center justify-center">
             <span className="text-4xl">🎪</span>
@@ -194,6 +194,7 @@ function ManagerDashboard() {
         {/* Main Content */}
         <main className="flex-1 flex flex-col gap-6 p-4 sm:p-6 lg:p-8 lg:gap-8">
           <div className="block sm:hidden w-full rounded-lg bg-emerald-500/90 text-white p-3 text-center font-semibold">DEBUG: manager main rendered (mobile-only)</div>
+          <div className="block sm:hidden w-full rounded-lg bg-white text-black p-6 text-center font-extrabold mt-4">DEBUG: PLACEHOLDER CONTENT — visible on mobile</div>
           {/* Header Section */}
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div className="flex flex-col gap-1">
