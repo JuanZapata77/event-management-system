@@ -414,6 +414,8 @@ function WorkerPortal() {
 
   const notificationBadgeCount = unreadCount > 0 ? unreadCount : availableEvents.length;
 
+  const mobileNavItems = navItems;
+
   const renderScheduleCards = (items) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {items.length > 0 ? (
@@ -612,24 +614,24 @@ function WorkerPortal() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f7f6f8] dark:bg-[#191022]">
-      <aside className="w-64 flex-shrink-0 bg-slate-100 dark:bg-slate-900/50 border-r border-slate-200 dark:border-[#7311d4]/20 hidden lg:flex flex-col">
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#7311d4] flex items-center justify-center text-white">
+    <div className="flex min-h-[100dvh] flex-col overflow-x-hidden bg-[#f7f6f8] dark:bg-[#191022] lg:h-screen lg:flex-row lg:overflow-hidden">
+      <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-slate-100 dark:border-[#7311d4]/20 dark:bg-slate-900/50 lg:flex">
+        <div className="flex items-center gap-3 p-6">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7311d4] text-white">
             <span className="text-2xl">🎪</span>
           </div>
           <span className="text-xl font-bold tracking-tight text-[#7311d4]">EventPro</span>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          {navItems.map(item => (
+        <nav className="mt-4 flex-1 space-y-2 px-4">
+          {navItems.map((item) => (
             <button
               key={item.key}
               onClick={() => setActiveSection(item.key)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
                 activeSection === item.key
                   ? 'bg-[#7311d4] text-white'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-[#7311d4]/10 hover:text-[#7311d4]'
+                  : 'text-slate-600 hover:bg-[#7311d4]/10 hover:text-[#7311d4] dark:text-slate-400'
               }`}
             >
               <span className="text-xl">{item.icon}</span>
@@ -638,87 +640,109 @@ function WorkerPortal() {
           ))}
         </nav>
 
-        <div className="p-4 mt-auto">
-          <div className="bg-[#7311d4]/10 border border-[#7311d4]/20 rounded-xl p-4">
-            <p className="text-xs font-semibold text-[#7311d4] uppercase tracking-wider mb-1">Current Status</p>
+        <div className="mt-auto border-t border-[#7311d4]/10 p-4">
+          <div className="rounded-xl border border-[#7311d4]/20 bg-[#7311d4]/10 p-4">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#7311d4]">Current Status</p>
             <p className="text-sm dark:text-slate-300">{isAvailableForShifts ? 'Available for shifts' : 'Not available for shifts'}</p>
           </div>
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-y-auto bg-[#f7f6f8] dark:bg-[#191022]">
-        <header className="sticky top-0 z-10 bg-[#f7f6f8]/80 dark:bg-[#191022]/80 backdrop-blur-md border-b border-slate-200 dark:border-[#7311d4]/10 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full border-2 border-[#7311d4] overflow-hidden shadow-lg shadow-[#7311d4]/20 bg-[#7311d4]/20 flex items-center justify-center">
-              <span className="text-2xl">{worker?.name?.[0] || '👤'}</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold leading-none mb-1 dark:text-white">{worker?.name}</h1>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium px-2 py-0.5 rounded bg-[#7311d4]/20 text-[#7311d4] uppercase">{worker?.role || 'worker'}</span>
-                <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">${worker?.hourly_rate}/hr</span>
+      <main className="flex flex-1 flex-col overflow-visible bg-[#f7f6f8] dark:bg-[#191022] lg:overflow-y-auto">
+        <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-[#f7f6f8]/90 px-4 py-4 backdrop-blur-md dark:border-[#7311d4]/10 dark:bg-[#191022]/90 sm:px-6 lg:px-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex size-12 items-center justify-center overflow-hidden rounded-full border-2 border-[#7311d4] bg-[#7311d4]/20 shadow-lg shadow-[#7311d4]/20">
+                <span className="text-2xl">{worker?.name?.[0] || '👤'}</span>
+              </div>
+              <div>
+                <h1 className="mb-1 text-lg font-bold leading-none dark:text-white">{worker?.name}</h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded bg-[#7311d4]/20 px-2 py-0.5 text-xs font-medium uppercase text-[#7311d4]">{worker?.role || 'worker'}</span>
+                  <span className="text-sm font-medium text-slate-500 dark:text-slate-400">${worker?.hourly_rate}/hr</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <button onClick={() => setActiveSection('events')} className="p-2 rounded-full bg-slate-200 dark:bg-[#7311d4]/10 text-slate-600 dark:text-[#7311d4] relative">
-              <span className="text-xl">🔔</span>
-              {notificationBadgeCount > 0 && (
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
-                  {notificationBadgeCount}
-                </span>
-              )}
-            </button>
+            <div className="flex items-center gap-3 self-start sm:self-auto">
+              <button onClick={() => setActiveSection('events')} className="relative rounded-full bg-slate-200 p-2 text-slate-600 dark:bg-[#7311d4]/10 dark:text-[#7311d4]">
+                <span className="text-xl">🔔</span>
+                {notificationBadgeCount > 0 && (
+                  <span className="absolute right-0 top-0 inline-flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold leading-none text-white">
+                    {notificationBadgeCount}
+                  </span>
+                )}
+              </button>
 
-            <button
-              onClick={() => {
-                localStorage.removeItem('eventAuthUser');
-                setShowLogin(true);
-                setWorkerId(null);
-                setWorker(null);
-                setActiveSection('dashboard');
-              }}
-              className="px-4 py-2 rounded-lg bg-[#7311d4] text-white font-medium hover:brightness-110 transition-all"
-            >
-              Logout
-            </button>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('eventAuthUser');
+                  setShowLogin(true);
+                  setWorkerId(null);
+                  setWorker(null);
+                  setActiveSection('dashboard');
+                }}
+                className="rounded-lg bg-[#7311d4] px-4 py-2 font-medium text-white transition-all hover:brightness-110"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </header>
 
-        <div className="p-6 max-w-6xl mx-auto w-full space-y-8">
+        <div className="border-b border-slate-200/80 bg-[#f7f6f8]/95 px-4 py-3 dark:border-[#7311d4]/10 dark:bg-[#191022]/95 lg:hidden">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {mobileNavItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setActiveSection(item.key)}
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  activeSection === item.key
+                    ? 'bg-[#7311d4] text-white shadow-lg shadow-[#7311d4]/20'
+                    : 'bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 hover:bg-[#7311d4]/10 hover:text-[#7311d4] dark:bg-slate-900/40 dark:text-slate-300 dark:ring-[#7311d4]/10'
+                }`}
+              >
+                {item.icon} {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-5 pb-10 sm:px-6 sm:py-6 lg:px-6">
           {assignmentError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm font-medium">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
               {assignmentError}
             </div>
           )}
 
           {activeSection === 'dashboard' && (
             <>
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#7311d4] to-purple-900 p-8 text-white">
-                <div className="relative z-10">
-                  <h2 className="text-3xl font-black mb-2">Worker Portal</h2>
-                  <p className="text-purple-100 dark:text-slate-300 max-w-md">Welcome back, {worker?.name}. You have {upcomingConfirmedAssignments.length} upcoming shifts. Check out new available roles below.</p>
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#7311d4] to-purple-900 p-6 text-white sm:p-8">
+                <div className="relative z-10 max-w-md">
+                  <h2 className="mb-2 text-2xl font-black sm:text-3xl">Worker Portal</h2>
+                  <p className="text-sm leading-6 text-purple-100 dark:text-slate-300 sm:text-base">
+                    Welcome back, {worker?.name}. You have {upcomingConfirmedAssignments.length} upcoming shifts. Check out new available roles below.
+                  </p>
                 </div>
                 <div className="absolute -right-8 -bottom-8 opacity-20">
-                  <span className="text-[12rem]">📅</span>
+                  <span className="text-[8rem] sm:text-[12rem]">📅</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-[#7311d4]/10 rounded-xl p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-[#7311d4]/10 dark:bg-slate-900/40">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Upcoming Confirmed Shifts</p>
                   <p className="text-3xl font-black text-slate-900 dark:text-white">{upcomingConfirmedAssignments.length}</p>
                 </div>
-                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-[#7311d4]/10 rounded-xl p-5">
+                <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-[#7311d4]/10 dark:bg-slate-900/40">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Open Event Roles</p>
                   <p className="text-3xl font-black text-slate-900 dark:text-white">{availableEvents.length}</p>
                 </div>
               </div>
 
               <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold flex items-center gap-2 dark:text-white">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h3 className="flex items-center gap-2 text-xl font-bold dark:text-white">
                     <span className="text-[#7311d4]">📅</span>
                     My Schedule
                   </h3>
@@ -728,8 +752,8 @@ function WorkerPortal() {
               </section>
 
               <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold flex items-center gap-2 dark:text-white">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h3 className="flex items-center gap-2 text-xl font-bold dark:text-white">
                     <span className="text-[#7311d4]">🎫</span>
                     Available Events
                   </h3>
@@ -742,8 +766,8 @@ function WorkerPortal() {
 
           {activeSection === 'events' && (
             <section>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold flex items-center gap-2 dark:text-white">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-xl font-bold dark:text-white">
                   <span className="text-[#7311d4]">🎫</span>
                   Available Events
                 </h3>
@@ -754,8 +778,8 @@ function WorkerPortal() {
 
           {activeSection === 'schedule' && (
             <section>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold flex items-center gap-2 dark:text-white">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-xl font-bold dark:text-white">
                   <span className="text-[#7311d4]">📅</span>
                   My Schedule
                 </h3>
@@ -765,14 +789,14 @@ function WorkerPortal() {
           )}
 
           {activeSection === 'earnings' && (
-            <section className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-[#7311d4]/10 rounded-xl p-6">
-              <h3 className="text-xl font-bold dark:text-white mb-4">Earnings</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="rounded-lg border border-slate-200 dark:border-[#7311d4]/10 p-4">
+            <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-[#7311d4]/10 dark:bg-slate-900/40">
+              <h3 className="mb-4 text-xl font-bold dark:text-white">Earnings</h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-lg border border-slate-200 p-4 dark:border-[#7311d4]/10">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Hourly Rate</p>
                   <p className="text-2xl font-black text-slate-900 dark:text-white">${Number(worker?.hourly_rate || 0).toFixed(2)}/hr</p>
                 </div>
-                <div className="rounded-lg border border-slate-200 dark:border-[#7311d4]/10 p-4">
+                <div className="rounded-lg border border-slate-200 p-4 dark:border-[#7311d4]/10">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Estimated Upcoming Earnings</p>
                   <p className="text-2xl font-black text-slate-900 dark:text-white">${estimatedUpcomingEarnings.toFixed(2)}</p>
                 </div>
@@ -781,47 +805,47 @@ function WorkerPortal() {
           )}
 
           {activeSection === 'history' && (
-            <section className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-[#7311d4]/10 rounded-xl p-6">
-              <h3 className="text-xl font-bold dark:text-white mb-4">Work History</h3>
-              <div className="mb-4 flex items-center justify-between">
+            <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-[#7311d4]/10 dark:bg-slate-900/40">
+              <h3 className="mb-4 text-xl font-bold dark:text-white">Work History</h3>
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Completed events and earnings</p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Total Earned</p>
                   <p className="text-2xl font-black text-slate-900 dark:text-white">${historyTotal.toFixed(2)}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {historyAssignments.length > 0 ? historyAssignments.map(assign => (
-                  <div key={assign.id} className="rounded-lg border border-slate-200 dark:border-[#7311d4]/10 p-4 bg-white dark:bg-slate-900/30">
-                    <div className="flex items-start justify-between">
+                  <div key={assign.id} className="rounded-lg border border-slate-200 bg-white p-4 dark:border-[#7311d4]/10 dark:bg-slate-900/30">
+                    <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h4 className="font-bold text-lg dark:text-white">{assign.event_name}</h4>
+                        <h4 className="text-lg font-bold dark:text-white">{assign.event_name}</h4>
                         <p className="text-sm text-slate-500 dark:text-slate-400">{new Date(assign.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • {assign.start_time} - {assign.end_time}</p>
-                        <p className="text-xs text-slate-400 mt-2">Role: {assign.role_for_event}</p>
+                        <p className="mt-2 text-xs text-slate-400">Role: {assign.role_for_event}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Hours</p>
                         <p className="text-lg font-bold dark:text-white">{calculateAssignmentPayableHours(assign).toFixed(2)}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Earned</p>
+                        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Earned</p>
                         <p className="text-lg font-black text-[#7311d4]">${(Number(assign.estimated_earnings) || calculateAssignmentEarnings(assign)).toFixed(2)}</p>
                       </div>
                     </div>
                   </div>
                 )) : (
-                  <p className="text-center text-slate-500 dark:text-slate-400 py-8 col-span-full">No completed events in your history yet.</p>
+                  <p className="col-span-full py-8 text-center text-slate-500 dark:text-slate-400">No completed events in your history yet.</p>
                 )}
               </div>
             </section>
           )}
 
           {activeSection === 'settings' && (
-            <section className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-[#7311d4]/10 rounded-xl p-6">
-              <h3 className="text-xl font-bold dark:text-white mb-4">Settings</h3>
-              <div className="rounded-lg border border-slate-200 dark:border-[#7311d4]/10 p-4 space-y-4">
-                <div className="flex items-center justify-between">
+            <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-[#7311d4]/10 dark:bg-slate-900/40">
+              <h3 className="mb-4 text-xl font-bold dark:text-white">Settings</h3>
+              <div className="space-y-4 rounded-lg border border-slate-200 p-4 dark:border-[#7311d4]/10">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="font-semibold text-slate-900 dark:text-white">Availability</p>
                     <p className="text-sm text-slate-500 dark:text-slate-400">Toggle whether you are available for new shifts</p>
@@ -829,20 +853,20 @@ function WorkerPortal() {
                   <button
                     onClick={handleAvailabilityToggle}
                     disabled={isSavingAvailability}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold ${isAvailableForShifts ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'}`}
+                    className={`rounded-lg px-4 py-2 text-sm font-bold ${isAvailableForShifts ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'}`}
                   >
                     {isSavingAvailability ? 'Saving...' : (isAvailableForShifts ? 'Available' : 'Unavailable')}
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className="flex flex-col gap-1">
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Unavailable From</span>
                     <input
                       type="date"
                       value={unavailableFrom}
                       onChange={(event) => setUnavailableFrom(event.target.value)}
-                      className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/40 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-100"
                     />
                   </label>
                   <label className="flex flex-col gap-1">
@@ -851,7 +875,7 @@ function WorkerPortal() {
                       type="date"
                       value={unavailableTo}
                       onChange={(event) => setUnavailableTo(event.target.value)}
-                      className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/40 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-100"
                     />
                   </label>
                 </div>
@@ -859,7 +883,7 @@ function WorkerPortal() {
                 <button
                   onClick={handleSaveAvailability}
                   disabled={isSavingAvailability}
-                  className="px-4 py-2 rounded-lg text-sm font-bold bg-[#7311d4] text-white disabled:opacity-60"
+                  className="rounded-lg bg-[#7311d4] px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
                 >
                   {isSavingAvailability ? 'Saving...' : 'Save Availability'}
                 </button>
