@@ -50,40 +50,77 @@ function ManagerLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#7311d4] to-purple-900 flex items-center justify-center p-8">
-      <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Manager Login</h1>
-        <p className="text-gray-600 mb-6">Sign in with your manager credentials.</p>
+    <div className="relative min-h-screen overflow-hidden bg-[#0f081d] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(115,17,212,0.45),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(96,165,250,0.15),_transparent_32%),linear-gradient(135deg,_#0f081d_0%,_#1b102c_45%,_#12091f_100%)]" />
+      <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:52px_52px]" />
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Username</span>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              required
-              autoComplete="username"
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
-            />
-          </label>
+      <div className="relative mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-6 py-14 lg:grid-cols-[1.05fr,0.95fr] lg:px-10">
+        <section className="max-w-xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur">
+            <span className="text-lg">🔐</span>
+            Manager access
+          </div>
 
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Password</span>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              autoComplete="current-password"
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
-            />
-          </label>
+          <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl">
+            Sign in to the control room.
+          </h1>
 
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700">Authenticator Code</span>
+          <p className="mt-6 max-w-lg text-lg leading-8 text-white/72">
+            Use your manager credentials to reach the dashboard, staffing tools, inventory, and payments in one place.
+          </p>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+              <p className="text-sm font-semibold text-white">Fast access</p>
+              <p className="mt-1 text-sm leading-6 text-white/62">Jump directly into event planning and operations.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+              <p className="text-sm font-semibold text-white">2FA ready</p>
+              <p className="mt-1 text-sm leading-6 text-white/62">Authenticator codes are supported when enabled.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[28px] border border-white/10 bg-white/95 p-6 text-slate-900 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#7311d4]">Manager login</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Welcome back</h2>
+            </div>
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-[#7311d4]/10 text-2xl ring-1 ring-inset ring-[#7311d4]/15">
+              👔
+            </div>
+          </div>
+
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-slate-700">Username</span>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                required
+                autoComplete="username"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-[#7311d4] focus:bg-white focus:ring-4 focus:ring-[#7311d4]/15"
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-slate-700">Password</span>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                autoComplete="current-password"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-[#7311d4] focus:bg-white focus:ring-4 focus:ring-[#7311d4]/15"
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-slate-700">Authenticator Code</span>
               <input
                 type="text"
                 name="otpCode"
@@ -92,29 +129,32 @@ function ManagerLogin() {
                 autoComplete="one-time-code"
                 inputMode="numeric"
                 placeholder="123456"
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-[#7311d4] focus:bg-white focus:ring-4 focus:ring-[#7311d4]/15"
               />
-              <p className="mt-1 text-xs text-gray-500">Required once 2FA is enabled for the manager account.</p>
+              <p className="text-xs leading-5 text-slate-500">Required once 2FA is enabled for the manager account.</p>
             </label>
 
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
+            {error ? (
+              <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center rounded-2xl bg-[#7311d4] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#7311d4]/25 transition hover:-translate-y-0.5 hover:bg-[#6310b4] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? 'Signing in...' : 'Sign in to dashboard'}
+            </button>
+          </form>
 
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-[#7311d4] py-2.5 font-semibold text-white hover:bg-[#7311d4]/90 disabled:opacity-60"
+            type="button"
+            onClick={() => navigate('/')}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            Back to role selection
           </button>
-        </form>
-
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="mt-4 w-full rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          Back to role selection
-        </button>
+        </section>
       </div>
     </div>
   );

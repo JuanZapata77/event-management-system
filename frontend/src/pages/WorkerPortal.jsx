@@ -524,48 +524,88 @@ function WorkerPortal() {
 
   if (showLogin) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#7311d4] to-purple-900 flex items-center justify-center p-8">
-        <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Worker Portal Login</h2>
-          <p className="text-gray-600 mb-6">Sign in with your worker credentials.</p>
+      <div className="relative min-h-screen overflow-hidden bg-[#0f081d] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(115,17,212,0.4),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(34,211,238,0.15),_transparent_30%),linear-gradient(135deg,_#0f081d_0%,_#1b102c_45%,_#12091f_100%)]" />
+        <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:52px_52px]" />
 
-          <form className="space-y-4" onSubmit={handleLogin}>
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700">Username</span>
-              <input
-                type="text"
-                name="username"
-                value={loginForm.username}
-                onChange={handleLoginInputChange}
-                required
-                autoComplete="username"
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
-              />
-            </label>
+        <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-6 py-14 lg:grid-cols-[1.05fr,0.95fr] lg:px-10">
+          <section className="max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur">
+              <span className="text-lg">🧰</span>
+              Worker portal
+            </div>
 
-            <label className="block">
-              <span className="text-sm font-medium text-gray-700">Password</span>
-              <input
-                type="password"
-                name="password"
-                value={loginForm.password}
-                onChange={handleLoginInputChange}
-                required
-                autoComplete="current-password"
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7311d4]"
-              />
-            </label>
+            <h2 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl">
+              Sign in, check shifts, and get moving.
+            </h2>
 
-            {loginError ? <p className="text-sm text-red-600">{loginError}</p> : null}
+            <p className="mt-6 max-w-lg text-lg leading-8 text-white/72">
+              Use your worker login to view assignments, confirm attendance, and update availability from one place.
+            </p>
 
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full rounded-lg bg-[#7311d4] py-2.5 font-semibold text-white hover:bg-[#7311d4]/90 disabled:opacity-60"
-            >
-              {isLoggingIn ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+                <p className="text-sm font-semibold text-white">Shift updates</p>
+                <p className="mt-1 text-sm leading-6 text-white/62">See new assignments and changes faster.</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-4 backdrop-blur">
+                <p className="text-sm font-semibold text-white">Availability</p>
+                <p className="mt-1 text-sm leading-6 text-white/62">Keep your schedule current for managers.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-[28px] border border-white/10 bg-white/95 p-6 text-slate-900 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#7311d4]">Worker login</p>
+                <h3 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Welcome back</h3>
+              </div>
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-2xl ring-1 ring-inset ring-cyan-400/15">
+                👨‍🍳
+              </div>
+            </div>
+
+            <form className="mt-8 space-y-5" onSubmit={handleLogin}>
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-slate-700">Username</span>
+                <input
+                  type="text"
+                  name="username"
+                  value={loginForm.username}
+                  onChange={handleLoginInputChange}
+                  required
+                  autoComplete="username"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-[#7311d4] focus:bg-white focus:ring-4 focus:ring-[#7311d4]/15"
+                />
+              </label>
+
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-slate-700">Password</span>
+                <input
+                  type="password"
+                  name="password"
+                  value={loginForm.password}
+                  onChange={handleLoginInputChange}
+                  required
+                  autoComplete="current-password"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-[#7311d4] focus:bg-white focus:ring-4 focus:ring-[#7311d4]/15"
+                />
+              </label>
+
+              {loginError ? (
+                <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{loginError}</p>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-[#7311d4] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#7311d4]/25 transition hover:-translate-y-0.5 hover:bg-[#6310b4] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoggingIn ? 'Signing in...' : 'Sign in to portal'}
+              </button>
+            </form>
+          </section>
         </div>
       </div>
     );
