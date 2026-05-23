@@ -155,7 +155,8 @@ function ManagerDashboard() {
   };
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-[#f7f6f8] dark:bg-[#191022]">
+    <div className="__dbg_force_visible relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-[#f7f6f8] dark:bg-[#191022]">
+      <style>{`@media (max-width: 1024px) { .__dbg_force_visible { overflow: visible !important; } .__dbg_force_visible main { background: #ffffff !important; color: #000000 !important; min-height: 50vh !important; } .__dbg_force_visible main * { color: #000000 !important; background: transparent !important; } .__dbg_force_visible .rounded-xl, .__dbg_force_visible table, .__dbg_force_visible tr, .__dbg_force_visible td { background: #ffffff !important; color: #000000 !important; } }`}</style>
       {/* removed full-screen overlay; using in-flow mobile placeholder instead */}
       {/* Top Navigation Bar */}
       <header style={{outline: '3px solid #ff00ff'}} className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 bg-[#f7f6f8] px-4 py-3 dark:border-[#7311d4]/20 dark:bg-[#191022] sm:px-6 lg:px-10">
