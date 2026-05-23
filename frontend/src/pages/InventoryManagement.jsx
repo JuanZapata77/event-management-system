@@ -86,10 +86,10 @@ function InventoryManagement() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f7f6f8] dark:bg-[#191022]">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#f7f6f8] dark:bg-[#191022] lg:flex-row">
       <ManagerSidebar active="inventory" />
 
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>

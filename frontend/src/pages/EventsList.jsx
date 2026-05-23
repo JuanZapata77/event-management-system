@@ -144,11 +144,11 @@ function EventsList() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f7f6f8] dark:bg-[#191022]">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#f7f6f8] dark:bg-[#191022] lg:flex-row">
       <ManagerSidebar active="events" />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden lg:overflow-y-auto">
         {/* Header */}
         <header className="h-16 flex items-center justify-between px-8 bg-[#f7f6f8]/50 dark:bg-[#191022]/50 backdrop-blur-md border-b border-[#7311d4]/10 sticky top-0 z-10">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
@@ -179,7 +179,7 @@ function EventsList() {
         </header>
 
         {/* Page Body */}
-        <div className="p-8 overflow-y-auto">
+        <div className="p-4 overflow-y-auto sm:p-6 lg:p-8">
           {/* Page Title & Primary Action */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
