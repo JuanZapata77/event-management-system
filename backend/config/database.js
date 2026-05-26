@@ -11,8 +11,11 @@ const poolConfig = {
 
 // Enable SSL if requested (useful for cloud providers like Supabase)
 if (process.env.DB_SSL === 'true') {
+  // By default verify the database server certificate. Only disable verification
+  // in exceptional debugging/testing scenarios by setting
+  // DB_SSL_REJECT_UNAUTHORIZED=false in the environment.
   poolConfig.ssl = {
-    rejectUnauthorized: false,
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
   };
 }
 

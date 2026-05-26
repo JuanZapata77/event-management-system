@@ -26,3 +26,19 @@
 
 - The repo still has other routes that should be reviewed for full role-based authorization.
 - This change fixes the highest-risk IDOR and authentication trust issues first.
+
+## TLS and CSRF status
+
+- TLS: The database SSL configuration was tightened so that certificate
+	verification is enabled by default when `DB_SSL=true`. To disable verification
+	for testing only, set `DB_SSL_REJECT_UNAUTHORIZED=false`. See
+	`backend/config/database.js` for details. This removes the `rejectUnauthorized: false`
+	pattern that Semgrep flagged.
+
+- CSRF: The API uses `Authorization: Bearer <token>` headers for authentication
+	(JWTs issued at login). Because browsers do not automatically attach
+	`Authorization` headers to cross-site requests (unlike cookies), the classic
+	CSRF threat is substantially reduced for these endpoints. For that reason we
+	accepted the Semgrep CSRF finding for now and documented the rationale here.
+	If the project later switches to cookie-based authentication or server-side
+	sessions, we should add `csurf` middleware and a frontend token flow.
