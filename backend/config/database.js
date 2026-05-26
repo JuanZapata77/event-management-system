@@ -17,6 +17,15 @@ if (process.env.DB_SSL === 'true') {
   poolConfig.ssl = {
     rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
   };
+
+  // If a CA certificate is provided through the environment (useful for
+  // providers that use self-signed certs), include it so Node can verify the
+  // server certificate. Support both escaped-newline and real-newline formats.
+  if (process.env.DB_CA_CERT) {
+    const raw = process.env.DB_CA_CERT;
+    const ca = raw.includes('-----BEGIN') ? raw : raw.replace(/\\n/g, '\n');
+    poolConfig.ssl.ca = ca;
+  }
 }
 
 const pool = new Pool(poolConfig);

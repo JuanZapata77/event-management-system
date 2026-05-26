@@ -42,3 +42,21 @@
 	accepted the Semgrep CSRF finding for now and documented the rationale here.
 	If the project later switches to cookie-based authentication or server-side
 	sessions, we should add `csurf` middleware and a frontend token flow.
+
+### Render deployment note / immediate fix
+
+If your managed database uses a self-signed certificate (common in some
+managed/test environments), set one of the following in the Render service
+environment variables:
+
+- Quick (less secure) workaround: `DB_SSL_REJECT_UNAUTHORIZED=false` — this
+	disables server certificate verification and will stop the "self-signed
+	certificate" errors.
+
+- Recommended secure approach: provide the CA certificate used by the DB as
+	`DB_CA_CERT`. Paste the PEM contents into the environment variable (use
+	`\n` for newlines if the dashboard requires a single-line value). The
+	server will use this CA to verify the DB certificate.
+
+After setting either env var on Render, redeploy the service so the new
+configuration is picked up.
