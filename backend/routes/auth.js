@@ -1,8 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { generateSecret, generateURI, verify } = require('otplib');
 const QRCode = require('qrcode');
 const pool = require('../config/database');
+const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -159,19 +161,31 @@ router.post('/login', async (req, res) => {
             [account.id]
         );
 
-        return res.json({ user: safeUserResult.rows[0] });
+        const safeUser = safeUserResult.rows[0];
+        const token = jwt.sign(
+            {
+                userId: safeUser.id,
+                role: safeUser.role,
+                username: safeUser.username,
+            },
+            JWT_SECRET,
+            { expiresIn: '12h' }
+        );
+
+        return res.json({ user: safeUser, token });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Server error' });
     }
 });
 
-router.post('/manager-2fa/setup', async (req, res) => {
+router.post('/manager-2fa/setup', authenticateToken, async (req, res) => {
     try {
-        const { userId, password } = req.body;
+        const { password } = req.body;
+        const userId = req.auth?.userId;
 
         if (!userId || !password) {
-            return res.status(400).json({ error: 'userId and password are required' });
+            return res.status(400).json({ error: 'password is required' });
         }
 
         const result = await pool.query(

@@ -46,6 +46,7 @@ function ManagerSidebar({ active = 'dashboard', className = '' }) {
           <button
             onClick={() => {
               localStorage.removeItem('eventAuthUser');
+              localStorage.removeItem('eventAuthToken');
               navigate('/');
             }}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 transition-colors hover:bg-red-500/10 hover:text-red-500 dark:text-slate-400"
@@ -71,6 +72,7 @@ function ManagerSidebar({ active = 'dashboard', className = '' }) {
           <button
             onClick={() => {
               localStorage.removeItem('eventAuthUser');
+              localStorage.removeItem('eventAuthToken');
               navigate('/');
             }}
             className="rounded-full border border-[#7311d4]/15 bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-red-500/10 hover:text-red-500 dark:bg-white/5 dark:text-slate-200"

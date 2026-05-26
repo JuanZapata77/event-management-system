@@ -41,6 +41,7 @@ function ManagerLogin() {
       }
 
       localStorage.setItem('eventAuthUser', JSON.stringify(payload.user));
+      localStorage.setItem('eventAuthToken', payload.token);
       navigate('/manager');
     } catch (submitError) {
       setError(submitError.message || 'Unexpected error while signing in');

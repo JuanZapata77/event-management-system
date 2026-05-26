@@ -242,6 +242,7 @@ function WorkerPortal() {
       }
 
       localStorage.setItem('eventAuthUser', JSON.stringify(payload.user));
+      localStorage.setItem('eventAuthToken', payload.token);
       setWorkerId(payload.user.id);
       setShowLogin(false);
       setActiveSection('dashboard');
@@ -403,7 +404,10 @@ function WorkerPortal() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/notifications?userId=${workerId}`);
+      const token = localStorage.getItem('eventAuthToken');
+      const res = await fetch(`${API_BASE_URL}/api/notifications?userId=${workerId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (!res.ok) return;
       const data = await res.json();
       setUnreadCount((data || []).filter(n => !n.is_read).length);
@@ -677,6 +681,7 @@ function WorkerPortal() {
               <button
                 onClick={() => {
                   localStorage.removeItem('eventAuthUser');
+                  localStorage.removeItem('eventAuthToken');
                   setShowLogin(true);
                   setWorkerId(null);
                   setWorker(null);

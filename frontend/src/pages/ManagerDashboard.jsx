@@ -120,9 +120,9 @@ function ManagerDashboard() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('eventAuthToken') || ''}`,
         },
         body: JSON.stringify({
-          userId: currentUser?.id,
           password: mfaPassword,
         }),
       });
