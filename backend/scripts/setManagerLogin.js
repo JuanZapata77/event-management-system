@@ -1,15 +1,8 @@
 require('dotenv').config();
-const { Pool } = require('pg');
+const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 async function run() {
-  const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-  });
 
   const plainPassword = 'Manager@123';
   const passwordHash = await bcrypt.hash(plainPassword, 10);

@@ -18,29 +18,40 @@ Run the SQL from `database/schema.sql` and then the migration files in `database
 
 Deploy the `backend/` folder to Render or Railway.
 
-Required environment variables:
+Required environment variables (Choose Option A or Option B):
 
+**Option A (Recommended for Neon, Supabase, Render Postgres, Railway):**
+- `DATABASE_URL` = your full postgres connection string (e.g., `postgresql://user:password@ep-host.region.aws.neon.tech/dbname?sslmode=require`)
+- `PORT` = `5000` (Render will set this automatically)
+- `CORS_ORIGIN` = your Vercel frontend URL, e.g. `https://your-app.vercel.app`
+- `JWT_SECRET` = random secure string
+
+**Option B (Separate DB variables):**
 - `DB_USER`
 - `DB_HOST`
 - `DB_NAME`
 - `DB_PASSWORD`
-- `DB_PORT`
+- `DB_PORT` (e.g. `5432`)
+- `DB_SSL` = `true` (required for Neon / Supabase)
 - `PORT`
 - `CORS_ORIGIN`
-
-Suggested `CORS_ORIGIN` value:
-
-- Your Vercel frontend URL, for example `https://your-app.vercel.app`
-- You can also keep localhost for development: `http://localhost:3000`
+- `JWT_SECRET`
 
 Start command:
 
 - `npm start`
 
-Important:
+Initialize / Seed Database command:
 
-- The backend now uses `process.env.PORT`.
-- CORS accepts a comma-separated list from `CORS_ORIGIN`.
+- The backend automatically verifies and creates required tables and default manager account (`manager` / `Manager@123`) on startup.
+- You can also manually run: `npm run db:init`
+
+Health Check & Diagnostics:
+
+- Visit `https://your-backend.onrender.com/api/health` in your browser.
+  - Returns `{"status":"ok","database":"connected","latencyMs":...}` when working.
+  - Returns descriptive diagnostics if database connection fails.
+- Visit `https://your-backend.onrender.com/api/test` to test connectivity.
 
 ## 3. Frontend deployment
 

@@ -25,6 +25,12 @@ async function getUsersColumnInfo() {
                 return {
                     hasMfaEnabled: columns.has('mfa_enabled'),
                     hasMfaSecret: columns.has('mfa_secret'),
+                    hasAvailability: columns.has('is_available_for_shifts'),
+                    hasUnavailableFrom: columns.has('unavailable_from'),
+                    hasUnavailableTo: columns.has('unavailable_to'),
+                    hasPhone: columns.has('phone'),
+                    hasHourlyRate: columns.has('hourly_rate'),
+                    hasUsername: columns.has('username'),
                 };
             })
             .catch((error) => {
@@ -57,23 +63,21 @@ async function ensureMfaColumns() {
     return getUsersColumnInfo();
 }
 
-function buildUserSelectColumns({ hasMfaEnabled }) {
+function buildUserSelectColumns({ hasMfaEnabled, hasAvailability, hasUnavailableFrom, hasUnavailableTo, hasPhone, hasHourlyRate }) {
     const columns = [
         'id',
         'name',
         'email',
         'username',
         'role',
-        'phone',
-        'hourly_rate',
-        'is_available_for_shifts',
-        'unavailable_from',
-        'unavailable_to',
     ];
 
-    if (hasMfaEnabled) {
-        columns.push('mfa_enabled');
-    }
+    if (hasPhone !== false) columns.push('phone');
+    if (hasHourlyRate !== false) columns.push('hourly_rate');
+    if (hasAvailability !== false) columns.push('is_available_for_shifts');
+    if (hasUnavailableFrom !== false) columns.push('unavailable_from');
+    if (hasUnavailableTo !== false) columns.push('unavailable_to');
+    if (hasMfaEnabled) columns.push('mfa_enabled');
 
     columns.push('created_at');
     return columns.join(',\n    ');
@@ -92,7 +96,8 @@ router.post('/login', async (req, res) => {
         }
 
         const normalizedUsername = String(username).trim().toLowerCase();
-        const { hasMfaEnabled, hasMfaSecret } = await getUsersColumnInfo();
+        const columnInfo = await getUsersColumnInfo();
+        const { hasMfaEnabled, hasMfaSecret } = columnInfo;
 
         const loginColumns = [
             'id',
@@ -146,10 +151,17 @@ router.post('/login', async (req, res) => {
                 return res.status(401).json({ error: 'Two-factor code is required for manager login' });
             }
 
-            const otpValid = verify({
-                secret: account.mfa_secret,
-                token: providedOtp,
-            });
+            let otpValid = false;
+            try {
+                const verificationResult = await verify({
+                    secret: account.mfa_secret,
+                    token: providedOtp,
+                });
+                otpValid = Boolean(verificationResult?.valid);
+            } catch (otpErr) {
+                // Catches TokenLengthError or invalid format from otplib
+                otpValid = false;
+            }
 
             if (!otpValid) {
                 return res.status(401).json({ error: 'Invalid two-factor code' });
@@ -157,7 +169,7 @@ router.post('/login', async (req, res) => {
         }
 
         const safeUserResult = await pool.query(
-            `SELECT ${buildUserSelectColumns({ hasMfaEnabled })} FROM users WHERE id = $1`,
+            `SELECT ${buildUserSelectColumns(columnInfo)} FROM users WHERE id = $1`,
             [account.id]
         );
 
@@ -174,8 +186,19 @@ router.post('/login', async (req, res) => {
 
         return res.json({ user: safeUser, token });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Server error' });
+        console.error('Login error:', error);
+        const errorMessage = error?.message || 'Server error';
+        if (
+            error.code === 'ECONNREFUSED' ||
+            errorMessage.includes('certificate') ||
+            error.code === '28P01' ||
+            error.code === 'ENOTFOUND'
+        ) {
+            return res.status(500).json({
+                error: `Database connection error: ${errorMessage}. Please check backend DB environment variables and SSL settings.`
+            });
+        }
+        return res.status(500).json({ error: `Server error: ${errorMessage}` });
     }
 });
 
