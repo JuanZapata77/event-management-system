@@ -1,51 +1,39 @@
-# Event Management System
+# 🎟️ Event Management System
 
-A full-stack event management application with manager and worker portals.
+![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) ![CI/CD](https://img.shields.io/badge/CI%2FCD-Auto_Deploy-blue?style=for-the-badge)
 
-## Deployment
+A full-stack event management application designed to streamline event coordination with dedicated portals for managers and operational staff. 
 
-- **Frontend (Vercel):** https://event-management-system-mejf.vercel.app
-- **Backend (Render):** https://event-management-system-rpkt.onrender.com
-- **Database (Supabase):** PostgreSQL (hosted)
+**[View Live Frontend Demo](https://event-management-system-mejf.vercel.app)** | **[Backend API (Render)](https://event-management-system-rpkt.onrender.com)**
 
-## Demo Credentials
+> **Demo Credentials**
+> - **Role:** Manager
+> - **Username:** `manager`
+> - **Password:** `Manager@123`
 
-- **Manager Login:**
-  - Username: `manager`
-  - Password: `Manager@123`
+---
 
-## Features
+## ✨ Features
+- **Manager Dashboard:** High-level overview for event creation, staff allocation, and scheduling.
+- **Worker Portal:** Dedicated interface for staff to manage shift availability and assignments.
+- **Real-Time Automation:** Automated event status tracking.
+- **Financial Tracking:** Integrated payment tracking and reporting modules.
 
-- Manager dashboard for event and staff management
-- Worker portal for shift availability and assignments
-- Real-time event status automation
-- Payment tracking and reporting
+## 💻 Tech Stack & Architecture
+- **Frontend:** React (Deployed via Vercel)
+- **Backend:** Node.js (Deployed via Render)
+- **Database:** PostgreSQL hosted on Supabase
+- **DevOps:** CI/CD pipelines configured for auto-deployment on pushes to the `main` branch.
 
-## Local Development
+---
 
-### Backend
+## 🛠️ Local Development
+
+### Prerequisites
+Make sure you have Node.js installed and a local or hosted instance of PostgreSQL (like Supabase) running.
+
+### Backend Setup
 ```bash
 cd backend
 npm install
 npm start
-```
-
-Requires `.env` with `DB_*` variables pointing to local PostgreSQL or Supabase.
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm start
-```
-
-Requires `REACT_APP_API_URL` env var (defaults to `http://localhost:5000`).
-
-## Auto-Deploy
-
-- Frontend: Auto-deploys on pushes to `main` (Vercel)
-- Backend: Auto-deploys on pushes to `main` (Render)
-
----
-
-*Last updated: May 20, 2026 - Auto-deploy test*
