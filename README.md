@@ -32,19 +32,15 @@ A full-stack event management application designed to streamline event coordinat
 ### Prerequisites
 Make sure you have Node.js installed and a local or hosted instance of PostgreSQL (like Supabase) running.
 
-### Backend Setup
+### Backend/Frontend Setup
 ```bash
 cd backend
 npm install
 npm start
 
-### Frontent Setup
 cd frontend
 npm install
 npm start
-### Frontend Setup
-cd frontend
-npm install
-npm start
+
 
 
