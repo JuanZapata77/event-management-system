@@ -37,3 +37,10 @@ Make sure you have Node.js installed and a local or hosted instance of PostgreSQ
 cd backend
 npm install
 npm start
+
+### Frontend Setup
+cd frontend
+npm install
+npm start
+
+
